@@ -1,0 +1,22 @@
+{
+  "project": {
+    "identical_numerical_and_data_files": 106,
+    "random_weight_default_network_shape": [
+      1,
+      1,
+      128,
+      128
+    ],
+    "exact_reference_parity": true,
+    "verified_input_pngs": 96,
+    "legacy_torch_rfft_available": false,
+    "checkpoint_present": false,
+    "byte_identical_files": 104,
+    "numerical_statements_unchanged": true
+  },
+  "environment": {
+    "numpy": "2.5.3",
+    "torch": "2.14.0",
+    "h5py": "3.16.0"
+  }
+}
