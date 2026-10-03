@@ -1,4 +1,4 @@
-# Maintained by nazeeh111
+#Chris Metzler
 #2/13/20
 
 import torch as torch

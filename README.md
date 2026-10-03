@@ -1,6 +1,6 @@
 # SpeckleVision
 
-**Development history:** Developed locally using Git before publication. These projects were published to GitHub together, so similar upload dates do not indicate when development began.
+This repository packages [Deep Inverse Correlography](https://github.com/ricedsp/Deep_Inverse_Correlography/tree/b7f720fdeab6a028415710a87634e66d6f95e154), by **Christopher Metzler and the cited research collaborators**, for the Optica 2020 paper Deep-inverse correlography: towards real-time high-resolution non-line-of-sight imaging. SpeckleVision adds repository presentation, setup guidance and bounded CPU verification records. The original methods, datasets and reported research results belong to the cited source. [Source and additions](NOTICE.md).
 
 ![SpeckleVision](assets/identity.svg)
 

@@ -1,5 +1,5 @@
 %% Generate training data
-% Maintained by nazeeh111
+% Chris Metzler
 
 addpath(genpath('.'))
 
