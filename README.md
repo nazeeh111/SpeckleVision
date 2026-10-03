@@ -1,10 +1,10 @@
 # SpeckleVision
 
-This repository packages [Deep Inverse Correlography](https://github.com/ricedsp/Deep_Inverse_Correlography/tree/b7f720fdeab6a028415710a87634e66d6f95e154), by **Christopher Metzler and the cited research collaborators**, for the Optica 2020 paper Deep-inverse correlography: towards real-time high-resolution non-line-of-sight imaging. SpeckleVision adds repository presentation, setup guidance and bounded CPU verification records. The original methods, datasets and reported research results belong to the cited source. [Source and additions](NOTICE.md).
-
 ![SpeckleVision](assets/identity.svg)
 
 Recover hidden-scene structure from noisy speckle correlations using a convolutional network. Includes inference, training, correlation utilities, synthetic training-data generation, and sample correlation images.
+
+This repository adds setup guidance and bounded CPU verification records.
 
 ## Inference
 
@@ -24,5 +24,9 @@ Download [BSD-500](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/gr
 ## Verification
 
 See [verification](VERIFICATION.md). A randomly initialized CPU network smoke check is not trained reconstruction or an accuracy result. Trained inference needs the separate checkpoint and a compatible CUDA software environment.
+
+## Source and license
+
+Based on [Deep Inverse Correlography](https://github.com/ricedsp/Deep_Inverse_Correlography/tree/b7f720fdeab6a028415710a87634e66d6f95e154) by **Christopher Metzler and the cited research collaborators**. [Source and contribution details](NOTICE.md).
 
 Maintained by **nazeeh111**. The separately owned U-net component retains its [third-party terms](THIRD_PARTY_NOTICES.md).
