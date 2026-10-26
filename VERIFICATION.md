@@ -13,3 +13,16 @@ Not run: pretrained inference, training, or CUDA. Trained weights are absent. Th
 An isolated local CPU environment used NumPy 2.5.3, PyTorch 2.14.0, h5py 3.16.0, SciPy 1.18.1, and Matplotlib 3.11.2. It did not replace the archived dependency manifests or modify shared environments.
 
 [Machine-readable check results](verification.json) record dimensions and available checks.
+
+## Correlation compatibility update, 26 October 2026
+
+The retained `utils/xcorr2.py` is now intentionally changed to replace removed
+`torch.rfft`/`torch.irfft` calls with `torch.fft` complex transforms. Function
+arguments, output shapes, normalization and unshifted autocorrelation order are
+preserved. Eight CPU regression cases compare unequal-sized batched correlation
+and gradients, autocorrelation order, padded/unpadded power and complex input
+against independent SciPy/NumPy calculations. Run `python -m pytest -q tests`.
+The earlier 106-file identity statement and machine-readable verification record
+are historical; this utility no longer matches that snapshot byte for byte.
+No trained weights or data were changed. Full pretrained inference, training
+and CUDA remain unverified because the trained checkpoint is absent.
