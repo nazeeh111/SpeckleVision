@@ -2,11 +2,11 @@
 
 **Hidden-scene structure from noisy speckle correlations.**
 
-Explore the retained [Deep Inverse Correlography](NOTICE.md) implementation: a U-net maps a correlation image into an estimated scene. This edition adds setup guidance and bounded CPU verification records. The research model and sample inputs remain the original authors' work.
+A U-net maps a correlation image into an estimated hidden scene. Inspect the bundled correlation inputs, follow the inference path, or set up the compatible research environment below.
 
 <img src="datasets/SubsampledData/test/5_n2_corr_x100_nzero1_npatch1.png" width="508" alt="Retained grayscale sample correlation PNG, shown as stored with two side-by-side panels of noisy correlation structure.">
 
-*Bundled sample input, shown as stored in the [retained source](NOTICE.md). Neither panel is a reconstructed scene. The demo consumes only the left half after resizing; no trained output is bundled.*
+*Bundled sample input. Neither panel is a reconstructed scene. The demo consumes only the left half after resizing; no trained output is bundled.*
 
 [Browse the inputs](#inspect-the-bundled-inputs) · [Follow the inference path](#what-the-demo-does) · [Run with trained weights](#trained-inference) · [Verification limits](VERIFICATION.md)
 
@@ -72,10 +72,8 @@ Model architecture, normalization, training defaults and sample data remain unch
 <a id="verification"></a>
 <a id="source-and-license"></a>
 
-## Evidence and source
+## Verification and license
 
 The [verification record](VERIFICATION.md) describes a prior randomly initialized CPU network check. That check is not trained reconstruction or evidence of accuracy. No new trained inference, training or CUDA result is claimed here.
 
-Based on [Deep Inverse Correlography](https://github.com/ricedsp/Deep_Inverse_Correlography/tree/b7f720fdeab6a028415710a87634e66d6f95e154) by **Christopher Metzler and the cited research collaborators**. [Source and additions](NOTICE.md) · [Original license](LICENSE) · [New-addition terms](LICENSE-branding) · [Third-party U-net terms](THIRD_PARTY_NOTICES.md).
-
-Maintained by [nazeeh111](https://github.com/nazeeh111).
+[Source provenance](NOTICE.md) · [Original license](LICENSE) · [New-addition terms](LICENSE-branding) · [U-net component terms](THIRD_PARTY_NOTICES.md).
