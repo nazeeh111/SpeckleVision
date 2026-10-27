@@ -55,7 +55,7 @@ The central crop is a display/output convention in this source, not the full net
 
 ## Trained inference
 
-The retained demo needs PyTorch, torchvision, matplotlib, Pillow, an **NVIDIA CUDA environment**, and the external checkpoint. It explicitly loads the checkpoint onto CUDA; the presence of a CPU fallback variable does not make this demo CPU-ready. Historical correlation utilities use `torch.rfft`/`torch.irfft`; full reproduction needs a compatible historical PyTorch environment.
+The retained demo needs PyTorch, torchvision, matplotlib, Pillow, an **NVIDIA CUDA environment**, and the external checkpoint. It explicitly loads the checkpoint onto CUDA; the presence of a CPU fallback variable does not make this demo CPU-ready. The correlation utilities use the current `torch.fft` API and have independent CPU checks against SciPy correlation and NumPy spectra. Full pretrained reproduction still requires the external checkpoint and a compatible CUDA environment.
 
 1. Obtain the separately hosted [trained network](https://stanford.box.com/s/zyzdhzyk68xw6z8whpcup5cman55esl7) and place `TrainedNetwork.pth` in `checkpoints/`.
 2. Keep `datasets/SubsampledData/` as the default input root, or select another collection root in `demo.py`.

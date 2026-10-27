@@ -23,27 +23,16 @@ def xcorr2_torch(a,b=torch.tensor([])):#Torch implementation of correlate2d
         b_full=torch.zeros((n_batch,ha+hb-1,wa+wb-1),dtype=a.dtype,device=mydevice)
         a_full[:,0:ha,0:wa]=a[:,0,:,:]
         b_full[:, 0:hb, 0:wb] = flip(flip(b[:, 0, :, :], 1), 2)
-        A=torch.rfft(a_full,signal_ndim=2,onesided=False,normalized=False)
-        B=torch.rfft(b_full,signal_ndim=2,onesided=False,normalized=False)
-        C=torch.zeros((n_batch,ha + hb - 1, wa + wb - 1,2),dtype=a.dtype,device=mydevice)#Fourth dim used to separate real and imaginary component
-        Ar=A[:,:,:,0]
-        Ai=A[:,:,:,1]
-        Br=B[:,:,:,0]
-        Bi=B[:,:,:,1]
-        C[:,:,:,0]=Ar*Br-Ai*Bi#Elementwise Product. Need to implement complex multiplication
-        C[:,:,:,1]=Ar*Bi+Ai*Br
-        astarb[:,0,:,:]=torch.irfft(C,2,onesided=False,normalized=False)
+        A=torch.fft.fft2(a_full)
+        B=torch.fft.fft2(b_full)
+        astarb[:,0,:,:]=torch.fft.ifft2(A*B).real
         return astarb
     else: #compute autocorrelation of a
         astara = torch.zeros(n_batch, n_c, 2 * ha - 1, 2 * wa - 1, dtype=a.dtype, device=mydevice)
         a_full = torch.zeros(n_batch, 2 * ha - 1, 2 * wa - 1, dtype=a.dtype, device=mydevice)
         a_full[:, 0:ha, 0:wa] = a[:, 0, :, :]
-        A = torch.rfft(a_full, signal_ndim=2, onesided=False, normalized=False)
-        Ar = A[:, :, :, 0]
-        Ai = A[:, :, :, 1]
-        Aabs2 = torch.zeros((n_batch, 2 * ha - 1, 2 * wa - 1, 2), dtype=a.dtype, device=mydevice)  # Fourth dim used to separate real and imaginary component
-        Aabs2[:, :, :, 0] = Ar.abs() ** 2 + Ai.abs() ** 2
-        astara[:,0,:,:] = torch.irfft(Aabs2, signal_ndim=2, onesided=False, normalized=False)
+        A = torch.fft.fft2(a_full)
+        astara[:,0,:,:] = torch.fft.ifft2(A.abs().square()).real
         #Still need to apply fftshift to astara for it to be consistent with the other definitions
         return astara
 
@@ -59,27 +48,16 @@ def xcorr2_torch_CPU(a,b=torch.tensor([])):#Torch implementation of correlate2d
         b_full=torch.zeros((n_batch,ha+hb-1,wa+wb-1),dtype=a.dtype,device=mydevice)
         a_full[:,0:ha,0:wa]=a[:,0,:,:]
         b_full[:, 0:hb, 0:wb] = flip(flip(b[:, 0, :, :], 1), 2)
-        A=torch.rfft(a_full,signal_ndim=2,onesided=False,normalized=False)
-        B=torch.rfft(b_full,signal_ndim=2,onesided=False,normalized=False)
-        C=torch.zeros((n_batch,ha + hb - 1, wa + wb - 1,2),dtype=a.dtype,device=mydevice)#Fourth dim used to separate real and imaginary component
-        Ar=A[:,:,:,0]
-        Ai=A[:,:,:,1]
-        Br=B[:,:,:,0]
-        Bi=B[:,:,:,1]
-        C[:,:,:,0]=Ar*Br-Ai*Bi#Elementwise Product. Need to implement complex multiplication
-        C[:,:,:,1]=Ar*Bi+Ai*Br
-        astarb[:,0,:,:]=torch.irfft(C,2,onesided=False,normalized=False)
+        A=torch.fft.fft2(a_full)
+        B=torch.fft.fft2(b_full)
+        astarb[:,0,:,:]=torch.fft.ifft2(A*B).real
         return astarb
     else: #compute autocorrelation of a
         astara = torch.zeros(n_batch, n_c, 2 * ha - 1, 2 * wa - 1, dtype=a.dtype, device=mydevice)
         a_full = torch.zeros(n_batch, 2 * ha - 1, 2 * wa - 1, dtype=a.dtype, device=mydevice)
         a_full[:, 0:ha, 0:wa] = a[:, 0, :, :]
-        A = torch.rfft(a_full, signal_ndim=2, onesided=False, normalized=False)
-        Ar = A[:, :, :, 0]
-        Ai = A[:, :, :, 1]
-        Aabs2 = torch.zeros((n_batch, 2 * ha - 1, 2 * wa - 1, 2), dtype=a.dtype, device=mydevice)  # Fourth dim used to separate real and imaginary component
-        Aabs2[:, :, :, 0] = Ar.abs() ** 2 + Ai.abs() ** 2
-        astara[:,0,:,:] = torch.irfft(Aabs2, signal_ndim=2, onesided=False, normalized=False)
+        A = torch.fft.fft2(a_full)
+        astara[:,0,:,:] = torch.fft.ifft2(A.abs().square()).real
         #Still need to apply fftshift to astara for it to be consistent with the other definitions
         return astara
 
@@ -88,9 +66,9 @@ def FourierMod2_nopad(a):
     mydevice=a.device
     assert n_c==1, "Only grayscale currently supported"
     a=a.view(n_batch,ha,wa)
-    A=torch.rfft(a,signal_ndim=2,onesided=False,normalized=False)
-    Ar = A[:, :, :, 0]
-    Ai = A[:, :, :, 1]
+    A=torch.fft.fft2(a)
+    Ar = A.real
+    Ai = A.imag
     Aabs2=Ar.abs()**2+Ai.abs()**2#Unlike the definition used in xcorr2, Aabs2 is not complex here.
     return Aabs2.reshape([n_batch,n_c,ha,wa]), Ar.reshape([n_batch,n_c,ha,wa]), Ai.reshape([n_batch,n_c,ha,wa])
 
@@ -99,9 +77,9 @@ def FourierMod2_nopad_complex(a):
     mydevice=a.device
     assert n_c==1, "Only grayscale currently supported"
     a=a.view(n_batch,ha,wa,2)
-    A=torch.fft(a,signal_ndim=2,normalized=False)
-    Ar = A[:, :, :, 0]
-    Ai = A[:, :, :, 1]
+    A=torch.fft.fft2(torch.view_as_complex(a.contiguous()))
+    Ar = A.real
+    Ai = A.imag
     Aabs2=Ar.abs()**2+Ai.abs()**2#Unlike the definition used in xcorr2, Aabs2 is not complex here.
     return Aabs2.reshape([n_batch,n_c,ha,wa]), Ar.reshape([n_batch,n_c,ha,wa]), Ai.reshape([n_batch,n_c,ha,wa])
 
@@ -111,9 +89,9 @@ def FourierMod2(a):
     assert n_c==1, "Only grayscale currently supported"
     a_pad = torch.zeros(n_batch, 2*ha - 1, 2*wa - 1, dtype=a.dtype, device=mydevice)
     a_pad[:, 0:ha, 0:wa]=a[:, 0, :, :]
-    A=torch.rfft(a_pad,signal_ndim=2,onesided=False,normalized=False)
-    Ar = A[:, :, :, 0]
-    Ai = A[:, :, :, 1]
+    A=torch.fft.fft2(a_pad)
+    Ar = A.real
+    Ai = A.imag
     Aabs2=Ar.abs()**2+Ai.abs()**2#Unlike the definition used in xcorr2, Aabs2 is not complex here.
     return Aabs2.reshape([n_batch,n_c,2*ha-1,2*wa-1]), Ar.reshape([n_batch,n_c,2*ha-1,2*wa-1]), Ai.reshape([n_batch,n_c,2*ha-1,2*wa-1])
 
@@ -123,9 +101,9 @@ def FourierMod2_CPU(a):
     assert n_c==1, "Only grayscale currently supported"
     a_pad = torch.zeros(n_batch, 2*ha - 1, 2*wa - 1, dtype=a.dtype, device=mydevice)
     a_pad[:, 0:ha, 0:wa]=a[:, 0, :, :]
-    A=torch.rfft(a_pad,signal_ndim=2,onesided=False,normalized=False)
-    Ar = A[:, :, :, 0]
-    Ai = A[:, :, :, 1]
+    A=torch.fft.fft2(a_pad)
+    Ar = A.real
+    Ai = A.imag
     Aabs2=Ar.abs()**2+Ai.abs()**2#Unlike the definition used in xcorr2, Aabs2 is not complex here.
     return Aabs2.reshape([n_batch,n_c,2*ha-1,2*wa-1])
 
@@ -148,8 +126,8 @@ def test():
 
     [n_batch, n_c, ha, wa]=a.shape
     absFa2=torch.zeros((n_batch, n_c, 2*ha-1, 2*wa-1,2))
-    absFa2[:,:,:,:,0]=FourierMod2(a_torch)
-    astara_4= torch.irfft(absFa2, signal_ndim=2, onesided=False, normalized=False)#0-lag is at 0
+    absFa2[:,:,:,:,0]=FourierMod2(a_torch)[0]
+    astara_4= torch.fft.ifft2(torch.view_as_complex(absFa2.contiguous())).real#0-lag is at 0
 
     # Apply an fftshift to astara_3 to make it consistent with the other definitions
     astara_4=np.array(astara_4)
