@@ -13,3 +13,22 @@ Not run: pretrained inference, training, or CUDA. Trained weights are absent. Th
 An isolated local CPU environment used NumPy 2.5.3, PyTorch 2.14.0, h5py 3.16.0, SciPy 1.18.1, and Matplotlib 3.11.2. It did not replace the archived dependency manifests or modify shared environments.
 
 [Machine-readable check results](verification.json) record dimensions and available checks.
+
+## Current numerical/input contracts, 2026-10-29
+
+The earlier source-identity receipt above describes the historical snapshot.
+The correlation helpers now use modern `torch.fft`; direct spatial correlation,
+NumPy Fourier references, zero-lag placement, changed inputs and finite-difference
+gradient checks establish their retained numerical contracts. The current demo
+loads to CPU by default, explicitly selects evaluation/inference mode, preserves
+RGB/bicubic/channel/left-half/central-crop semantics and writes fresh results
+with hashes. Safe state dictionaries work by default; legacy whole-model pickle
+requires explicit trust. The U-net architecture and bundled input bytes are unchanged.
+
+Run `python -m unittest discover -s tests -v` after installing
+`requirements-inference.txt`. These checks include an actual U-net on two bundled
+correlation inputs with temporary seeded random weights, not trained reconstruction
+or task quality. The Stanford Box checkpoint link returned HTTP404 during the
+check; no checkpoint was downloaded or redistributed. Compatible trained
+weights with verified provenance/license and independent reconstruction quality
+remain unresolved. Full MATLAB/BSD500 training and CUDA were not executed.

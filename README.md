@@ -44,10 +44,10 @@ This checks the bundled files, not the model. A failed count or image check mean
 
 [`demo.py`](demo.py) defines the exact path from a stored file to an output:
 
-1. Load files through `ImageFolder`, keeping the collection's `test/` subfolder.
+1. Load image files in sorted path order, including the collection's `test/` subfolder.
 2. Resize each PNG to **256 wide × 128 high** and normalize the pixels.
 3. Take channel 0 and the **left 128 columns** as a `1 × 1 × 128 × 128` network input. The stored right half is not a network prediction.
-4. Run the loaded U-net, display its **central 64 × 64 crop**, and save that crop as `Reconstructions/0_recon.png`, `1_recon.png`, and so on.
+4. Run the loaded U-net in evaluation mode, extract its **central 64 × 64 crop**, and save a float32 `.npy` array and grayscale PNG, with input/checkpoint hashes in `run.json`.
 
 The central crop is a display/output convention in this source, not the full network output. The [`network architecture`](utils/network.py), [`correlation utilities`](utils/xcorr2.py) and [`training-data generator`](create_training_data.m) are available for inspection.
 
@@ -55,25 +55,37 @@ The central crop is a display/output convention in this source, not the full net
 
 ## Trained inference
 
-The retained demo needs PyTorch, torchvision, matplotlib, Pillow, an **NVIDIA CUDA environment**, and the external checkpoint. It explicitly loads the checkpoint onto CUDA; the presence of a CPU fallback variable does not make this demo CPU-ready. Historical correlation utilities use `torch.rfft`/`torch.irfft`; full reproduction needs a compatible historical PyTorch environment.
+The demo supports CPU by default and requires a compatible checkpoint. It never downloads weights or uses a camera. Install its inference dependencies, then supply legally obtained weights:
 
-1. Obtain the separately hosted [trained network](https://stanford.box.com/s/zyzdhzyk68xw6z8whpcup5cman55esl7) and place `TrainedNetwork.pth` in `checkpoints/`.
-2. Keep `datasets/SubsampledData/` as the default input root, or select another collection root in `demo.py`.
-3. From the repository root, run `python demo.py`.
+```bash
+python -m pip install -r requirements-inference.txt
+python demo.py --checkpoint /path/to/checkpoint.pth --device cpu \
+  --input datasets/SubsampledData --output Reconstructions/my-run --limit 2
+```
 
-The checkpoint download link is retained from the research source; its availability has not been verified. `checkpoints/` and `Reconstructions/` contain placeholders, not weights or results. A missing checkpoint or CUDA error means the prerequisites are incomplete; use the input inspection above while setting up the research environment.
+The output directory must be new; earlier results are never overwritten. Safe `state_dict` loading is the default. The original training code saved a complete Python model; **only for a trusted legacy checkpoint**, add `--trust-legacy-pickle`. This explicitly enables Python pickle loading, which can execute code. The unchanged U-net architecture is required for raw state dictionaries. The checkpoint hash identifies bytes, not training history or accuracy.
+
+The original [Stanford Box checkpoint link](https://stanford.box.com/s/zyzdhzyk68xw6z8whpcup5cman55esl7) returned HTTP404 during the 2026-10-29 check. No trained checkpoint or new trained reconstruction is bundled. External checkpoint/data redistribution terms still require verification. No substitute or random-weight reconstruction is presented as a learned result.
+
+Without weights, the independently working correlation/Fourier subset and software contracts can be checked:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+The tests compare the modern FFT implementation against direct spatial correlation and NumPy Fourier references, including lag order and differentiable training loss. A separate actual U-net run uses **temporary seeded random weights** with two bundled correlation images; it checks input/output contracts and repeatability, not reconstruction quality. Inference uses evaluation mode, so dropout and batch-normalization updates do not make repeated results stochastic.
 
 ## Training
 
 Place the BSD-500 JPEG images directly in [`datasets/BSD500/`](datasets/BSD500), as expected by [`create_training_data.m`](create_training_data.m). The [BSD-500 source](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/resources.html) is external. Run the generator in MATLAB with its image-processing functions available, then `python train_network.py` in a compatible PyTorch environment. The generator writes `datasets/Edges_b80_gammap0.015_res64/`, the training script's default input root.
 
-Model architecture, normalization, training defaults and sample data remain unchanged. [Raw speckle measurements](https://stanford.box.com/s/lta3jxsgrj49uio9v5qgko1betj8z77w) are referenced separately by the original project.
+Model architecture, normalization, training defaults and sample data remain unchanged. The correlation/Fourier helpers now use modern `torch.fft` with their original lag and scaling conventions; spatial, NumPy and gradient tests verify them. The full MATLAB/BSD500 training route has not been executed. [Raw speckle measurements](https://stanford.box.com/s/lta3jxsgrj49uio9v5qgko1betj8z77w) are referenced separately by the original project.
 
 <a id="verification"></a>
 <a id="source-and-license"></a>
 
 ## Verification and license
 
-The [verification record](VERIFICATION.md) describes a prior randomly initialized CPU network check. That check is not trained reconstruction or evidence of accuracy. No new trained inference, training or CUDA result is claimed here.
+The [verification record](VERIFICATION.md) describes a prior randomly initialized CPU network check. That check is not trained reconstruction or evidence of accuracy. Current CPU numerical and inference-contract tests extend this evidence; no new trained inference, training or CUDA result is claimed here.
 
 [Source provenance](NOTICE.md) · [Original license](LICENSE) · [New-addition terms](LICENSE-branding) · [U-net component terms](THIRD_PARTY_NOTICES.md).
