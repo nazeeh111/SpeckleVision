@@ -1,0 +1,4 @@
+# Python3.12 CPU/GPU PyTorch. No torchvision, matplotlib or acquisition packages.
+numpy
+Pillow
+torch>=2.6
